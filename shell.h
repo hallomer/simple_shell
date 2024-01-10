@@ -1,0 +1,19 @@
+#ifndef SHELL_H
+#define SHELL_H
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
+#define MAX_ARGS 100
+
+void print_environment(void);
+char *read_command(char *prompt);
+void tokenize_command(char *cmd, char **args);
+int check_builtin_commands(char **args);
+int find_path(char *command, char *path);
+int execute_command(char **args);
+
+#endif
