@@ -45,7 +45,6 @@ int main(void)
 	return (0);
 }
 
-extern char **environ;
 
 /**
  * print_environment - Print environment variables

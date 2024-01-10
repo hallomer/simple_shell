@@ -9,6 +9,8 @@
 
 #define MAX_ARGS 100
 
+extern char **environ;
+
 void print_environment(void);
 char *read_command(char *prompt);
 void tokenize_command(char *cmd, char **args);
