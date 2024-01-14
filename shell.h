@@ -11,11 +11,11 @@
 
 extern char **environ;
 
-void print_environment(void);
-char *read_command(char *prompt);
-void tokenize_command(char *cmd, char **args);
-int check_builtin_commands(char **args);
-int find_path(char *command, char *path);
+void print_env(void);
+char *read_command(const char *prompt);
+void tokenize_command(char *command, char **args);
+char *find_executable(char *command);
 int execute_command(char **args);
+int is_builtin(char **args);
 
 #endif

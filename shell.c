@@ -3,55 +3,58 @@
 /**
  * main - Entry point
  *
- * Return: 0
+ * Return: nothing
 */
 int main(void)
 {
-	char *prompt = "$ ", *cmd = NULL, *args[MAX_ARGS], *path;
+	const char *prompt = "$ ";
+	char *command = NULL, *args[MAX_ARGS], *executable;
 
 	while (1)
 	{
-		cmd = read_command(prompt);
-		if (cmd == NULL)
+		command = read_command(prompt);
+		if (command == NULL)
 			return (1);
-		tokenize_command(cmd, args);
+
+		tokenize_command(command, args);
 		if (args[0] == NULL)
 		{
-			free(cmd);
-			cmd = NULL;
+			free(command);
+			command = NULL;
 			continue;
 		}
-		if (check_builtin_commands(args))
+
+		if (is_builtin(args))
 		{
-			free(cmd);
-			cmd = NULL;
+			free(command);
+			command = NULL;
 			continue;
 		}
-		if (access(args[0], F_OK) == -1)
+
+		executable = find_executable(args[0]);
+		if (executable == NULL)
 		{
-			path = getenv("PATH");
-			if (!find_path(args[0], path))
-			{
-				fprintf(stderr, "%s: Command not found\n", args[0]);
-				free(cmd);
-				cmd = NULL;
-				continue;
-			}
+			fprintf(stderr, "%s: No such file or directory\n", args[0]);
+			free(command);
+			command = NULL;
+			continue;
 		}
+
+		args[0] = executable;
 		execute_command(args);
-		free(cmd);
-		cmd = NULL;
+
+		free(command);
+		command = NULL;
 	}
 	return (0);
 }
 
-
 /**
- * print_environment - Print environment variables
+ * print_env - Prints the current environment variables
  *
  * Return: nothing
 */
-void print_environment(void)
+void print_env(void)
 {
 	char **env = environ;
 
@@ -63,31 +66,18 @@ void print_environment(void)
 }
 
 /**
- * find_path - Find the command's path
- * @command: user's command
- * @path: path
+ * find_executable - Executes a command with the given arguments
+ * @command: An array of strings representing the command and its arguments
  *
- * Return: 1 if the command exists, 0 otherwise
+ * Return: 0 on success
 */
-int find_path(char *command, char *path)
+char *find_executable(char *command)
 {
-	char *dir = strtok(path, ":");
-	int command_exists = 0;
-	char command_path[256];
-
-	while (dir != NULL)
+	if (access(command, F_OK | X_OK) == 0)
 	{
-		snprintf(command_path, sizeof(command_path), "%s/%s", dir, command);
-
-		if (access(command_path, F_OK) == 0)
-		{
-			command_exists = 1;
-			strcpy(command, command_path);
-			break;
-		}
-
-		dir = strtok(NULL, ":");
+		return (strdup(command));
 	}
 
-	return (command_exists);
+	return (NULL);
 }
+
