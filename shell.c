@@ -1,83 +1,158 @@
 #include "shell.h"
 
 /**
- * main - Entry point
+ * main - Entry point for the shell
  *
- * Return: nothing
+ * Return: 0 on sucsess
 */
+
 int main(void)
 {
-	const char *prompt = "$ ";
-	char *command = NULL, *args[MAX_ARGS], *executable;
+	char *cmd, *new_line = NULL, *token;
+	size_t cmd_size = 0;
+	ssize_t read_cmd;
+	int status = 0;
 
 	while (1)
 	{
-		command = read_command(prompt);
-		if (command == NULL)
-			return (1);
+		if (isatty(STDIN_FILENO))
+			write(1, "$ ", 2);
 
-		tokenize_command(command, args);
-		if (args[0] == NULL)
+		read_cmd = getline(&cmd, &cmd_size, stdin);
+		if (read_cmd == -1 || is_empty(cmd))
 		{
-			free(command);
-			command = NULL;
-			continue;
+			free(cmd);
+			exit(status);
 		}
-
-		if (is_builtin(args))
+		is_newline(cmd);
+		if (is_env(cmd) != 1)
 		{
-			free(command);
-			command = NULL;
-			continue;
+			new_line = malloc(strlen(cmd) + 1);
+			strcpy(new_line, cmd);
+			if (is_empty(new_line))
+			{
+				free(cmd);
+				free(new_line);
+				exit(status);
+			}
+
+			token = strtok(new_line, " \t\n");
+			while (token)
+				token = strtok(NULL, " \t\n");
+
+			free(new_line);
 		}
-
-		executable = find_executable(args[0]);
-		if (executable == NULL)
-		{
-			fprintf(stderr, "%s: No such file or directory\n", args[0]);
-			free(command);
-			command = NULL;
-			continue;
-		}
-
-		args[0] = executable;
-		execute_command(args);
-
-		free(command);
-		command = NULL;
+		 execute(cmd);
 	}
 	return (0);
 }
 
+
 /**
- * print_env - Prints the current environment variables
+ * is_empty - Check if string is empty or space
+ * @str: string
+ *
+ * Return: 1 if not empty
+*/
+
+int is_empty(const char *str)
+{
+	if (str == NULL)
+		return (1);
+
+	while (*str)
+	{
+		if (*str != ' ' && *str != '\t' && *str != '\n' &&
+			*str != '\v' && *str != '\f' && *str != '\r')
+			return (0);
+		str++;
+	}
+
+	return (1);
+}
+/**
+ * is_newline - If there is \n char, it removes it
+ * @cmd: command
  *
  * Return: nothing
 */
-void print_env(void)
+void is_newline(char *cmd)
 {
-	char **env = environ;
+	int i = 0;
 
-	while (*env != NULL)
+	while (cmd[i] != '\0')
 	{
-		printf("%s\n", *env);
-		env++;
+		if (cmd[i] == '\n')
+			cmd[i] = '\0';
+		i++;
 	}
 }
+
+
 
 /**
- * find_executable - Executes a command with the given arguments
- * @command: An array of strings representing the command and its arguments
+ * is_env - Check if command is env
+ * @cmd: command
  *
- * Return: 0 on success
+ * Return: 1 if env
 */
-char *find_executable(char *command)
+int is_env(char *cmd)
 {
-	if (access(command, F_OK | X_OK) == 0)
-	{
-		return (strdup(command));
-	}
+	int i = 0;
 
-	return (NULL);
+	if (strncmp(cmd, "env", 3) == 0)
+	{
+		for (i = 0; environ[i]; i++)
+		{
+			write(STDOUT_FILENO, environ[i], strlen(environ[i]));
+			write(STDOUT_FILENO, "\n", 1);
+		}
+		return (1);
+	}
+	return (0);
 }
 
+
+/**
+ * execute - Executes commands
+ * @cmd: command
+ *
+ * Return: nothing
+*/
+void execute(char *cmd)
+{
+	char *args[1024], *token = strtok(cmd, " \t\n");
+	int i = 0;
+	pid_t pid;
+
+	while (token != NULL)
+	{
+		args[i] = token;
+		i++;
+		token = strtok(NULL, " \t\n");
+	}
+	args[i] = NULL;
+	pid = fork();
+
+	if (pid == -1)
+	{
+
+		perror("fork");
+		exit(EXIT_FAILURE);
+	}
+	else if (pid == 0)
+	{
+
+		if (execvp(args[0], args) == -1)
+		{
+			perror("execvp");
+			exit(EXIT_FAILURE);
+		}
+	}
+	else
+	{
+		int status;
+
+		waitpid(pid, &status, 0);
+	}
+}
