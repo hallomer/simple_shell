@@ -1,104 +1,48 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
-#include <sys/types.h>
+#include <string.h>
 #include <sys/wait.h>
 
-#define BUFFER_SIZE 1024
+#define MAX_LINE 1024
 
-/**
- * display_prompt - Displays the prompt
- *
- * Return: the command entered by the user
-*/
-void display_prompt(void)
-{
-	if (isatty(STDIN_FILENO))
-		write(STDOUT_FILENO, "$ ", 2);
-}
+int main() {
+    char line[MAX_LINE];
+    char *args[MAX_LINE / 2 + 1], *token;
+    int argc, status;
+    pid_t pid;
 
-/**
- * read_cmd - Reads a command from the user
- *
- * Return: the command entered by the user
-*/
-char *read_cmd(void)
-{
-	char *cmd = NULL;
-	size_t cmd_size = 0;
-	ssize_t read_cmd;
+    while (1) {
+        printf("$ ");
+        fflush(stdout);
 
-	read_cmd = getline(&cmd, &cmd_size, stdin);
-	if (read_cmd == -1)
-	{
-		free(cmd);
-		exit(EXIT_SUCCESS);
-	}
+        if (fgets(line, sizeof(line), stdin) == NULL)
+            break;
 
-	cmd[strcspn(cmd, "\n")] = '\0';
+        line[strcspn(line, "\n")] = '\0';
 
-	return (cmd);
-	}
+        argc = 0;
+        token = strtok(line, " ");
+        while (token != NULL) {
+            args[argc++] = token;
+            token = strtok(NULL, " ");
+        }
+        args[argc] = NULL;
 
-/**
- * execute_cmd - Executes a command with the given arguments
- * @cmd: command
- *
- * Return: 0 on success
-*/
-void execute_cmd(char *cmd)
-{
-	pid_t pid;
-	char *envp[] = {NULL};
+        pid = fork();
+        if (pid == -1) {
+            perror("fork");
+            exit(EXIT_FAILURE);
+        } else if (pid == 0) {
 
-	pid = fork();
-	if (pid == -1)
-	{
-		perror("fork");
-		exit(EXIT_FAILURE);
-	}
-	else if (pid == 0)
-	{
-		char **args = malloc(sizeof(char *) * 2);
-
-		args[0] = cmd;
-		args[1] = NULL;
-
-		if (execve(cmd, args, envp) == -1)
-		{
-			perror(cmd);
-			exit(EXIT_FAILURE);
-		}
-	}
-	else
-	{
-		int child_status;
-
-		if (waitpid(pid, &child_status, 0) == -1)
-		{
-			perror("waitpid");
-			exit(EXIT_FAILURE);
-		}
-	}
-}
-
-/**
- * main - Entry point
- *
- * Return: nothing
-*/
-int main(void)
-{
-	char *cmd;
-
-	while (1)
-	{
-		display_prompt();
-		cmd = read_cmd();
-		execute_cmd(cmd);
-		free(cmd);
-	}
-
-	return (0);
+            if (execvp(args[0], args) == -1) {
+                fprintf(stderr, "%s: Command not found\n", args[0]);
+                exit(EXIT_FAILURE);
+            }
+        } else {
+            waitpid(pid, &status, 0);
+        }
+    }
+    printf("\n");
+    return 0;
 }
