@@ -1,48 +1,57 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/wait.h>
+#include "shell.h"
 
-#define MAX_LINE 1024
+int main(int argc, char **argv)
+{
+	char *prompt = "$ ";
+	char *lineptr, *lineptr_copy = NULL;
+	size_t n = 0;
+	ssize_t nchars_read;
+	const char *delim = " \n";
+	int num_tokens = 0, i;
+	char *token;
 
-int main() {
-    char line[MAX_LINE];
-    char *args[MAX_LINE / 2 + 1], *token;
-    int argc, status;
-    pid_t pid;
+	(void)argc;
 
-    while (1) {
-        printf("$ ");
-        fflush(stdout);
+	while (1)
+	{
+		printf("%s", prompt);
+		nchars_read = getline(&lineptr, &n, stdin);
+		if (nchars_read == -1)
+			return (-1);
 
-        if (fgets(line, sizeof(line), stdin) == NULL)
-            break;
+		lineptr_copy = malloc(sizeof(char) * nchars_read);
+		if (lineptr_copy == NULL)
+		{
+			perror("tsh: memory allocation error");
+			return (-1);
+		}
+		strcpy(lineptr_copy, lineptr);
 
-        line[strcspn(line, "\n")] = '\0';
+		token = strtok(lineptr, delim);
+		while (token)
+		{
+			num_tokens++;
+			token = strtok(NULL, delim);
+		}
+		num_tokens++;
+		
+		argv = malloc(sizeof(char *) * num_tokens);
+		token = strtok(lineptr_copy, delim);
+		for (i = 0; token != NULL; i++)
+		{
+			argv[i] = malloc(sizeof(char) * strlen(token));
+			strcpy(argv[i], token);
+			token = strtok(NULL, delim);
+		}
 
-        argc = 0;
-        token = strtok(line, " ");
-        while (token != NULL) {
-            args[argc++] = token;
-            token = strtok(NULL, " ");
-        }
-        args[argc] = NULL;
+		argv[i] = NULL;
 
-        pid = fork();
-        if (pid == -1) {
-            perror("fork");
-            exit(EXIT_FAILURE);
-        } else if (pid == 0) {
+		execmd(argv);
 
-            if (execvp(args[0], args) == -1) {
-                fprintf(stderr, "%s: Command not found\n", args[0]);
-                exit(EXIT_FAILURE);
-            }
-        } else {
-            waitpid(pid, &status, 0);
-        }
-    }
-    printf("\n");
-    return 0;
+	}
+			
+	free(lineptr);
+	free(lineptr_copy);
+	
+	return (0);
 }
