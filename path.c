@@ -23,6 +23,7 @@ char *handle_empty_path(char *cmd)
  *
  * Return:full path of the or NULL
 */
+
 char *search_path(char *path, char *cmd)
 {
 	char *path_copy, *path_tokens, *file_path;
@@ -30,9 +31,6 @@ char *search_path(char *path, char *cmd)
 	struct stat buffer;
 
 	path_copy = strdup(path);
-	if (path_copy == NULL)
-		return (NULL);
-
 	cmd_len = strlen(cmd);
 	path_tokens = strtok(path_copy, ":");
 
@@ -40,11 +38,6 @@ char *search_path(char *path, char *cmd)
 	{
 		dir_len = strlen(path_tokens);
 		file_path = malloc(cmd_len + dir_len + 2);
-		if (file_path == NULL)
-		{
-			free(path_copy);
-			return (NULL);
-		}
 
 		strcpy(file_path, path_tokens);
 		strcat(file_path, "/");
