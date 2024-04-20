@@ -9,6 +9,3 @@ It can execute programs by their name after parsing command lines.
 - Implement basic built-in commands like env and exit
 - Handle argument passing and PATH searching
 
-## Usage
-
-./simple_shell

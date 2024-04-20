@@ -9,6 +9,10 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
+extern char **environ;
+
+int parse_command(char *line, char ***argv_cmd);
+void free_argv(char **argv);
 void execmd(char **argv_cmd, char *prog_name);
 
 #endif
