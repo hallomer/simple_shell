@@ -1,4 +1,5 @@
 #include "shell.h"
+
 /**
  * read_command - Read user input command
  * @line: pointer to store the user input
@@ -24,16 +25,24 @@ int execute_command(char **argv_cmd, char *prog_name, int argc)
 {
 	pid_t child_pid;
 	int status;
+	char *command_path = get_path(argv_cmd[0]);
+
+	if (command_path == NULL)
+	{
+		printf("%s: %d: %s: not found\n", prog_name, argc, argv_cmd[0]);
+		return (0);
+	}
 
 	child_pid = fork();
 	if (child_pid == -1)
 	{
 		perror(prog_name);
+		free(command_path);
 		return (1);
 	}
 	else if (child_pid == 0)
 	{
-		if (execve(argv_cmd[0], argv_cmd, environ) == -1)
+		if (execve(command_path, argv_cmd, environ) == -1)
 		{
 			printf("%s: %d: %s: not found\n", prog_name, argc, argv_cmd[0]);
 			exit(EXIT_FAILURE);
@@ -42,7 +51,57 @@ int execute_command(char **argv_cmd, char *prog_name, int argc)
 	else
 	{
 		wait(&status);
+		free(command_path);
 	}
 
 	return (0);
+}
+
+/**
+ * parse_command - Parse a command line string into an array of arguments
+ * @line: command line string to parse
+ *
+ * Return: array of strings containing the command, or NULL on failure
+*/
+char **parse_command(char *line)
+{
+	char *token;
+	char **argv_cmd;
+	int num_tokens = 0;
+	int i, j;
+	const char *delim = " \t\r\n";
+	char *line_copy = strdup(line);
+
+	token = strtok(line_copy, delim);
+	while (token != NULL)
+	{
+		num_tokens++;
+		token = strtok(NULL, delim);
+	}
+
+	argv_cmd = malloc(sizeof(char *) * (num_tokens + 1));
+	if (argv_cmd == NULL)
+	{
+		free(line_copy);
+		return (NULL);
+	}
+
+	token = strtok(line, delim);
+	for (i = 0; token != NULL; i++)
+	{
+		argv_cmd[i] = strdup(token);
+		if (argv_cmd[i] == NULL)
+		{
+			for (j = 0; j < i; j++)
+				free(argv_cmd[j]);
+			free(argv_cmd);
+			free(line_copy);
+			return (NULL);
+		}
+		token = strtok(NULL, delim);
+	}
+	argv_cmd[i] = NULL;
+
+	free(line_copy);
+	return (argv_cmd);
 }

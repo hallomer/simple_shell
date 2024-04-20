@@ -13,5 +13,7 @@ extern char **environ;
 
 ssize_t read_command(char **line, size_t *n);
 int execute_command(char **argv_cmd, char *prog_name, int argc);
+char **parse_command(char *line);
+char *get_path(char *cmd);
 
 #endif

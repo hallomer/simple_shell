@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 	char *line = NULL;
 	size_t n = 0;
 	ssize_t nread;
-	char *argv_cmd[2];
+	char **argv_cmd = NULL;
 	char *prog_name = argv[0];
 
 	if (argc < 1)
@@ -29,11 +29,14 @@ int main(int argc, char **argv)
 
 		line[nread - 1] = '\0';
 
-		argv_cmd[0] = line;
-		argv_cmd[1] = NULL;
+		argv_cmd = parse_command(line);
+		if (argv_cmd == NULL)
+			continue;
 
 		if (execute_command(argv_cmd, prog_name, argc))
 			break;
+
+		free(argv_cmd);
 	}
 
 	if (line)
