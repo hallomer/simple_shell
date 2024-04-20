@@ -14,9 +14,9 @@ extern char **environ;
 ssize_t read_command(char **line, size_t *n, FILE *input_stream);
 int execute_command(char **argv_cmd, char *prog_name, int argc);
 char **parse_command(char *line);
-char *get_path(char *cmd);
+char *get_path(char *cmd, char *prog_name, int argc);
 void free_argv(char **argv);
-char *handle_empty_path(char *cmd);
+char *handle_empty_path(char *cmd, char *prog_name, int argc);
 char *search_path(char *path, char *cmd);
 
 #endif
