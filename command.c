@@ -28,24 +28,20 @@ int execute_command(char **argv_cmd, char *prog_name, int argc)
 {
 	pid_t child_pid;
 	int status;
-	char *command_path = argv_cmd[0];
+	char *command_path = NULL;
 
-	if (access(command_path, X_OK) == -1)
+	command_path = get_path(argv_cmd[0]);
+	if (command_path == NULL)
 	{
-		command_path = get_path(argv_cmd[0]);
-		if (command_path == NULL)
-		{
-			fprintf(stderr, "%s: %d: %s: not found\n", prog_name, argc, argv_cmd[0]);
-			return (127);
-		}
+		fprintf(stderr, "%s: %d: %s: not found\n", prog_name, argc, argv_cmd[0]);
+		return (127);
 	}
 
 	child_pid = fork();
 	if (child_pid == -1)
 	{
 		perror(prog_name);
-		if (command_path != argv_cmd[0])
-			free(command_path);
+		free(command_path);
 		return (126);
 	}
 	else if (child_pid == 0)
@@ -53,14 +49,14 @@ int execute_command(char **argv_cmd, char *prog_name, int argc)
 		if (execve(command_path, argv_cmd, environ) == -1)
 		{
 			perror(prog_name);
+			free(command_path);
 			exit(127);
 		}
 	}
 	else
 	{
 		wait(&status);
-		if (command_path != argv_cmd[0])
-			free(command_path);
+		free(command_path);
 		return (WEXITSTATUS(status));
 	}
 
