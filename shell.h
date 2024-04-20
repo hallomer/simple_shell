@@ -11,8 +11,7 @@
 
 extern char **environ;
 
-int parse_command(char *line, char ***argv_cmd);
-void free_argv(char **argv);
-void execmd(char **argv_cmd, char *prog_name);
+ssize_t read_command(char **line, size_t *n);
+int execute_command(char **argv_cmd, char *prog_name, int argc);
 
 #endif
