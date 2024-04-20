@@ -24,6 +24,7 @@ ssize_t read_command(char **line, size_t *n, FILE *input_stream)
  *
  * Return: 0 on success, 1 on failure
 */
+
 int execute_command(char **argv_cmd, char *prog_name, int argc)
 {
 	pid_t child_pid;
@@ -46,14 +47,14 @@ int execute_command(char **argv_cmd, char *prog_name, int argc)
 		perror(prog_name);
 		if (command_path != argv_cmd[0])
 			free(command_path);
-		return (1);
+		return (126);
 	}
 	else if (child_pid == 0)
 	{
 		if (execve(command_path, argv_cmd, environ) == -1)
 		{
 			fprintf(stderr, "%s: %d: %s: not found\n", prog_name, argc, argv_cmd[0]);
-			exit(EXIT_FAILURE);
+			exit(127);
 		}
 	}
 	else
@@ -61,6 +62,7 @@ int execute_command(char **argv_cmd, char *prog_name, int argc)
 		wait(&status);
 		if (command_path != argv_cmd[0])
 			free(command_path);
+		return (WEXITSTATUS(status));
 	}
 
 	return (0);
