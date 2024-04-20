@@ -76,8 +76,7 @@ char **parse_command(char *line)
 {
 	char *token;
 	char **argv_cmd;
-	int num_tokens = 0;
-	int i, j;
+	int num_tokens = 0, i, j;
 	const char *delim = " \t\r\n";
 	char *line_copy = strdup(line);
 
@@ -87,21 +86,24 @@ char **parse_command(char *line)
 		num_tokens++;
 		token = strtok(NULL, delim);
 	}
-
+	if (num_tokens == 0)
+	{
+		free(line_copy);
+		return (NULL);
+	}
 	argv_cmd = malloc(sizeof(char *) * (num_tokens + 1));
 	if (argv_cmd == NULL)
 	{
 		free(line_copy);
 		return (NULL);
 	}
-
 	token = strtok(line, delim);
 	for (i = 0; token != NULL; i++)
 	{
 		argv_cmd[i] = strdup(token);
 		if (argv_cmd[i] == NULL)
 		{
-			for (j = 0; j < i; j++)
+			for (j = 0; j <= i; j++)
 				free(argv_cmd[j]);
 			free(argv_cmd);
 			free(line_copy);
@@ -110,7 +112,6 @@ char **parse_command(char *line)
 		token = strtok(NULL, delim);
 	}
 	argv_cmd[i] = NULL;
-
 	free(line_copy);
 	return (argv_cmd);
 }

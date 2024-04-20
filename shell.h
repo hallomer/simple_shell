@@ -15,5 +15,6 @@ ssize_t read_command(char **line, size_t *n, FILE *input_stream);
 int execute_command(char **argv_cmd, char *prog_name, int argc);
 char **parse_command(char *line);
 char *get_path(char *cmd);
+void free_argv(char **argv);
 
 #endif

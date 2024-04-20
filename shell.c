@@ -7,8 +7,6 @@
  *
  * Return: 0 on success, or the appropriate error code on failure
 */
-#include "shell.h"
-
 int main(int argc, char **argv)
 {
 	char *line = NULL;
@@ -42,7 +40,7 @@ int main(int argc, char **argv)
 		if (execute_command(argv_cmd, prog_name, argc))
 			break;
 
-		free(argv_cmd);
+		free_argv(argv_cmd);
 	}
 
 	if (line)
@@ -51,4 +49,19 @@ int main(int argc, char **argv)
 	if (input_stream != stdin)
 		fclose(input_stream);
 	return (EXIT_SUCCESS);
+}
+
+/**
+ * free_argv - Frees argv
+ * @argv: argv to free
+ *
+ * Return: nothing
+*/
+void free_argv(char **argv)
+{
+	int i;
+
+	for (i = 0; argv[i]; i++)
+		free(argv[i]);
+	free(argv);
 }
