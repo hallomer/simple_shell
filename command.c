@@ -32,7 +32,7 @@ int execute_command(char **argv_cmd, char *prog_name, int argc)
 
 	if (access(command_path, X_OK) == -1)
 	{
-		command_path = get_path(argv_cmd[0], prog_name, argc);
+		command_path = get_path(argv_cmd[0]);
 		if (command_path == NULL)
 		{
 			fprintf(stderr, "%s: %d: %s: not found\n", prog_name, argc, argv_cmd[0]);

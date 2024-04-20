@@ -3,19 +3,16 @@
 /**
  * handle_empty_path - Helper function
  * @cmd: command to check
- * @prog_name: name of program
- * @argc: arguments count
  *
  * Return: command path if it or NULL
 */
-char *handle_empty_path(char *cmd, char *prog_name, int argc)
+char *handle_empty_path(char *cmd)
 {
 	struct stat buffer;
 
 	if (stat(cmd, &buffer) == 0)
 		return (strdup(cmd));
 
-	fprintf(stderr, "%s: %d: %s: not found\n", prog_name, argc, cmd);
 	return (NULL);
 }
 
@@ -63,28 +60,24 @@ char *search_path(char *path, char *cmd)
 /**
  * get_path - Finds the full path of a command in the system's PATH
  * @cmd: command to find the full path for
- * @prog_name: name of program
- * @argc: arguments count
  *
  * Return: full path or NULL if not found
 */
-char *get_path(char *cmd, char *prog_name, int argc)
+char *get_path(char *cmd)
 {
 	char *path, *full_path;
 	struct stat buffer;
 
 	path = getenv("PATH");
 	if (!path || *path == '\0')
-		return (handle_empty_path(cmd, prog_name, argc));
+		return (handle_empty_path(cmd));
 
 	full_path = search_path(path, cmd);
 	if (full_path)
 		return (full_path);
 
-
 	if (stat(cmd, &buffer) == 0)
 		return (strdup(cmd));
 
-	fprintf(stderr, "%s: %d: %s: not found\n", prog_name, argc, cmd);
 	return (NULL);
 }
