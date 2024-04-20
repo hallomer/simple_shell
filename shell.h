@@ -6,7 +6,9 @@
 #include <sys/types.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
 
-void execmd(char **argv);
+void execmd(char **argv_cmd, char *prog_name);
 
 #endif
