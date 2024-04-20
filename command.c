@@ -4,14 +4,17 @@
  * read_command - Read user input command
  * @line: pointer to store the user input
  * @n: pointer to store the size of the line buffer
+ * @input_stream: from which to read the user input command
  *
  * Return: number of characters read, or -1 on error
 */
-ssize_t read_command(char **line, size_t *n)
+ssize_t read_command(char **line, size_t *n, FILE *input_stream)
 {
-	printf("$ ");
-	return (getline(line, n, stdin));
+	if (isatty(fileno(input_stream)))
+		printf("$ ");
+	return (getline(line, n, input_stream));
 }
+
 
 /**
  * execute_command - Execute the user input command

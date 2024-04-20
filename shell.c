@@ -7,6 +7,8 @@
  *
  * Return: 0 on success, or the appropriate error code on failure
 */
+#include "shell.h"
+
 int main(int argc, char **argv)
 {
 	char *line = NULL;
@@ -14,8 +16,12 @@ int main(int argc, char **argv)
 	ssize_t nread;
 	char **argv_cmd = NULL;
 	char *prog_name = argv[0];
+	FILE *input_stream = stdin;
 
-	if (argc < 1)
+	if (argc > 1)
+		input_stream = fopen(argv[1], "r");
+
+	if (input_stream == NULL)
 	{
 		perror(argv[0]);
 		return (EXIT_FAILURE);
@@ -23,7 +29,7 @@ int main(int argc, char **argv)
 
 	while (1)
 	{
-		nread = read_command(&line, &n);
+		nread = read_command(&line, &n, input_stream);
 		if (nread == -1)
 			break;
 
@@ -42,5 +48,7 @@ int main(int argc, char **argv)
 	if (line)
 		free(line);
 
+	if (input_stream != stdin)
+		fclose(input_stream);
 	return (EXIT_SUCCESS);
 }
