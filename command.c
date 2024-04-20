@@ -35,7 +35,7 @@ int execute_command(char **argv_cmd, char *prog_name, int argc)
 		command_path = get_path(argv_cmd[0]);
 		if (command_path == NULL)
 		{
-			printf("%s: %d: %s: not found\n", prog_name, argc, argv_cmd[0]);
+			fprintf(stderr, "%s: %d: %s: not found\n", prog_name, argc, argv_cmd[0]);
 			return (0);
 		}
 	}
@@ -52,7 +52,7 @@ int execute_command(char **argv_cmd, char *prog_name, int argc)
 	{
 		if (execve(command_path, argv_cmd, environ) == -1)
 		{
-			printf("%s: %d: %s: not found\n", prog_name, argc, argv_cmd[0]);
+			fprintf(stderr, "%s: %d: %s: not found\n", prog_name, argc, argv_cmd[0]);
 			exit(EXIT_FAILURE);
 		}
 	}

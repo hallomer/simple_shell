@@ -13,12 +13,13 @@ char *get_path(char *cmd)
 	struct stat buffer;
 
 	path = getenv("PATH");
-    if (path == NULL || strlen(path) == 0)
-    {
-        if (stat(cmd, &buffer) == 0)
-            return (strdup(cmd));
-        return (NULL);
-    }
+	if (!path || *path == '\0')
+	{
+		if (stat(cmd, &buffer) == 0)
+			return (strdup(cmd));
+		else
+			return (NULL);
+	}
 	if (path)
 	{
 		path_copy = strdup(path);
