@@ -30,6 +30,9 @@ int execute_command(char **argv_cmd, char *prog_name, int argc)
 	int status;
 	char *command_path = NULL;
 
+	if (argv_cmd[0] == NULL)
+		return (1);
+
 	command_path = get_path(argv_cmd[0]);
 	if (command_path == NULL)
 	{
