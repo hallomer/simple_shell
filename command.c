@@ -10,9 +10,17 @@
 */
 ssize_t read_command(char **line, size_t *n, FILE *input_stream)
 {
+	ssize_t nread;
+
 	if (isatty(fileno(input_stream)))
 		printf("$ ");
-	return (getline(line, n, input_stream));
+	nread = getline(line, n, input_stream);
+	if (nread == -1 && *line != NULL)
+	{
+		free(*line);
+		*line = NULL;
+	}
+	return (nread);
 }
 
 
@@ -81,6 +89,9 @@ char **parse_command(char *line)
 	int num_tokens = 0, i, j;
 	const char *delim = " \t\r\n";
 	char *line_copy = strdup(line);
+
+	if (line_copy == NULL)
+		return (NULL);
 
 	token = strtok(line_copy, delim);
 	while (token != NULL)

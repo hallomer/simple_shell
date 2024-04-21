@@ -9,10 +9,15 @@
 char *handle_empty_path(char *cmd)
 {
 	struct stat buffer;
+	char *dup_cmd = strdup(cmd);
+
+	if (dup_cmd == NULL)
+		return (NULL);
 
 	if (stat(cmd, &buffer) == 0)
-		return (strdup(cmd));
+		return (dup_cmd);
 
+	free(dup_cmd);
 	return (NULL);
 }
 
@@ -67,19 +72,27 @@ char *search_path(char *path, char *cmd)
 */
 char *get_path(char *cmd)
 {
-	char *path, *full_path;
+	char *path, *full_path, *dup_cmd;
 	struct stat buffer;
 
 	path = getenv("PATH");
 	if (!path || *path == '\0')
-		return (handle_empty_path(cmd));
+		return handle_empty_path(cmd);
 
 	full_path = search_path(path, cmd);
 	if (full_path)
 		return (full_path);
 
 	if (stat(cmd, &buffer) == 0)
-		return (strdup(cmd));
+	{
+		dup_cmd = strdup(cmd);
+		if (dup_cmd == NULL)
+		{
+			perror("strdup");
+			return (NULL);
+		}
+		return (dup_cmd);
+	}
 
 	return (NULL);
 }
