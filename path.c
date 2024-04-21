@@ -9,17 +9,14 @@
 char *handle_empty_path(char *cmd)
 {
 	struct stat buffer;
-	char *dup_cmd = strdup(cmd);
-
-	if (dup_cmd == NULL)
-		return (NULL);
 
 	if (stat(cmd, &buffer) == 0)
-		return (dup_cmd);
+		return (strdup(cmd));
 
-	free(dup_cmd);
 	return (NULL);
 }
+
+
 
 /**
  * search_path - Helper function
@@ -28,7 +25,6 @@ char *handle_empty_path(char *cmd)
  *
  * Return:full path of the or NULL
 */
-
 char *search_path(char *path, char *cmd)
 {
 	char *path_copy, *path_tokens, *file_path;
@@ -64,6 +60,7 @@ char *search_path(char *path, char *cmd)
 }
 
 
+
 /**
  * get_path - Finds the full path of a command in the system's PATH
  * @cmd: command to find the full path for
@@ -72,27 +69,19 @@ char *search_path(char *path, char *cmd)
 */
 char *get_path(char *cmd)
 {
-	char *path, *full_path, *dup_cmd;
+	char *path, *full_path;
 	struct stat buffer;
 
 	path = getenv("PATH");
 	if (!path || *path == '\0')
-		return handle_empty_path(cmd);
+		return (handle_empty_path(cmd));
 
 	full_path = search_path(path, cmd);
 	if (full_path)
 		return (full_path);
 
 	if (stat(cmd, &buffer) == 0)
-	{
-		dup_cmd = strdup(cmd);
-		if (dup_cmd == NULL)
-		{
-			perror("strdup");
-			return (NULL);
-		}
-		return (dup_cmd);
-	}
+		return (strdup(cmd));
 
 	return (NULL);
 }

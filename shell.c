@@ -15,7 +15,6 @@ int main(int argc, char **argv)
 	char **argv_cmd = NULL;
 	char *prog_name = argv[0];
 	FILE *input_stream = stdin;
-	int status;
 
 	if (argc > 1)
 		input_stream = fopen(argv[1], "r");
@@ -38,13 +37,10 @@ int main(int argc, char **argv)
 		if (argv_cmd == NULL)
 			continue;
 
-		status = execute_command(argv_cmd, prog_name, argc);
-		if (status)
-			return (status);
-
+		execute_command(argv_cmd, prog_name, argc);
 		free_argv(argv_cmd);
 	}
-	if (line)
+	if (line != NULL)
 		free(line);
 	if (input_stream != stdin)
 		fclose(input_stream);
@@ -60,6 +56,9 @@ int main(int argc, char **argv)
 void free_argv(char **argv)
 {
 	int i;
+
+	if (argv == NULL)
+		return;
 
 	for (i = 0; argv[i]; i++)
 		free(argv[i]);
