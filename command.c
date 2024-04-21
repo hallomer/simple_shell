@@ -50,6 +50,7 @@ int execute_command(char **argv_cmd, char *prog_name, int argc)
 		command_path = get_path(argv_cmd[0]);
 		if (command_path == NULL)
 		{
+			fprintf(stderr, "%s: %d: %s: not found\n", prog_name, argc, argv_cmd[0]);
 			return (127);
 		}
 	}
