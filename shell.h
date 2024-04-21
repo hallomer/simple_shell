@@ -16,7 +16,6 @@ int execute_command(char **argv_cmd, char *prog_name, int argc);
 char **parse_command(char *line);
 char *get_path(char *cmd);
 void free_argv(char **argv);
-char *handle_empty_path(char *cmd);
 char *search_path(char *path, char *cmd);
 
 #endif

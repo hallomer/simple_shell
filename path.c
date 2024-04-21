@@ -1,22 +1,5 @@
 #include "shell.h"
 
-/**
- * handle_empty_path - Helper function
- * @cmd: command to check
- *
- * Return: command path if it or NULL
-*/
-char *handle_empty_path(char *cmd)
-{
-	struct stat buffer;
-
-	if (stat(cmd, &buffer) == 0)
-		return (strdup(cmd));
-
-	return (NULL);
-}
-
-
 
 /**
  * search_path - Helper function
@@ -73,15 +56,16 @@ char *get_path(char *cmd)
 	struct stat buffer;
 
 	path = getenv("PATH");
-	if (!path || *path == '\0')
-		return (handle_empty_path(cmd));
+	if (path == NULL || *path == '\0')
+		return (NULL);
 
 	full_path = search_path(path, cmd);
-	if (full_path)
+	if (full_path == NULL)
+		return (NULL);
+
+	if (stat(full_path, &buffer) == 0)
 		return (full_path);
 
-	if (stat(cmd, &buffer) == 0)
-		return (strdup(cmd));
-
-	return (NULL);
+	else
+		return (NULL);
 }
