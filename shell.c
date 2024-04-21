@@ -37,10 +37,10 @@ int main(int argc, char **argv)
 		if (argv_cmd == NULL)
 			continue;
 		status = execute_command(argv_cmd, prog_name, argc);
-		if (status)
+		if (status && status != 127)
 		{
 			free_argv(argv_cmd);
-			continue;
+			return (status);
 		}
 		free_argv(argv_cmd);
 	}
