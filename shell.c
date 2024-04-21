@@ -25,7 +25,6 @@ int main(int argc, char **argv)
 		perror(argv[0]);
 		return (EXIT_FAILURE);
 	}
-
 	while (1)
 	{
 		nread = read_command(&line, &n, input_stream);
@@ -38,8 +37,12 @@ int main(int argc, char **argv)
 			continue;
 		status = execute_command(argv_cmd, prog_name, argc);
 		if (status)
-			return (status);
-		free_argv(argv_cmd);
+		{
+			fprintf(stderr, "%s: %d: %s: not found\n", prog_name, argc, argv_cmd[0]);
+			free_argv(argv_cmd);
+			continue;
+		}
+	free_argv(argv_cmd);
 	}
 	if (line != NULL)
 		free(line);
