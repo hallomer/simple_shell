@@ -2,6 +2,22 @@
 
 
 /**
+ * handle_empty_path - Helper fucntion
+ * @cmd: command to handle
+ *
+ * Return: command path or NULL
+*/
+char *handle_empty_path(char *cmd)
+{
+	struct stat buffer;
+
+	if (stat(cmd, &buffer) == 0)
+		return (strdup(cmd));
+
+	return (NULL);
+}
+
+/**
  * search_path - Helper function
  * @path: PATH string from the environment
  * @cmd: command to search for
@@ -56,16 +72,15 @@ char *get_path(char *cmd)
 	struct stat buffer;
 
 	path = getenv("PATH");
-	if (path == NULL || *path == '\0')
-		return (NULL);
+	if (!path || *path == '\0')
+		return (handle_empty_path(cmd));
 
 	full_path = search_path(path, cmd);
-	if (full_path == NULL)
-		return (NULL);
-
-	if (stat(full_path, &buffer) == 0)
+	if (full_path)
 		return (full_path);
 
-	else
-		return (NULL);
+	if (stat(cmd, &buffer) == 0)
+		return (strdup(cmd));
+
+	return (NULL);
 }
