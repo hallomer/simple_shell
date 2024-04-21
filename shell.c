@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 	char **argv_cmd = NULL;
 	char *prog_name = argv[0];
 	FILE *input_stream = stdin;
-	int status;
+	int status = 0;
 
 	if (argc > 1)
 		input_stream = fopen(argv[1], "r");
@@ -25,6 +25,7 @@ int main(int argc, char **argv)
 		perror(argv[0]);
 		return (EXIT_FAILURE);
 	}
+
 	while (1)
 	{
 		nread = read_command(&line, &n, input_stream);
@@ -35,16 +36,19 @@ int main(int argc, char **argv)
 		argv_cmd = parse_command(line);
 		if (argv_cmd == NULL)
 			continue;
+
 		status = execute_command(argv_cmd, prog_name, argc);
-		if (status)
-			return (status);
 		free_argv(argv_cmd);
 	}
 	if (line != NULL)
 		free(line);
 	if (input_stream != stdin)
 		fclose(input_stream);
-	return (EXIT_SUCCESS);
+
+	if (status == 127)
+		return (EXIT_FAILURE);
+	else
+		return (EXIT_SUCCESS);
 }
 
 /**
