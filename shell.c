@@ -30,8 +30,10 @@ int main(int argc, char **argv)
 	{
 		nread = read_command(&line, &n, input_stream);
 		if (nread == -1)
+		{
+			free(line);
 			break;
-
+		}
 		line[nread - 1] = '\0';
 
 		argv_cmd = parse_command(line);
@@ -45,7 +47,6 @@ int main(int argc, char **argv)
 		free(line);
 	if (input_stream != stdin)
 		fclose(input_stream);
-
 	return (status);
 }
 
@@ -60,6 +61,10 @@ void free_argv(char **argv)
 	int i;
 
 	for (i = 0; argv[i]; i++)
-		free(argv[i]);
-	free(argv);
+	{
+		if (argv[i] != NULL)
+			free(argv[i]);
+	}
+	if (argv != NULL)
+		free(argv);
 }

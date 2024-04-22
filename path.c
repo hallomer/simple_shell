@@ -79,5 +79,6 @@ char *get_path(char *cmd)
 	if (stat(cmd, &buffer) == 0)
 		return (strdup(cmd));
 
+	free(full_path);
 	return (NULL);
 }

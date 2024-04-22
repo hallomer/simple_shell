@@ -10,9 +10,17 @@
 */
 ssize_t read_command(char **line, size_t *n, FILE *input_stream)
 {
+	ssize_t nread;
+
 	if (isatty(fileno(input_stream)))
 		printf("(H) ");
-	return (getline(line, n, input_stream));
+	nread = getline(line, n, input_stream);
+	if (nread == -1)
+	{
+		free(*line);
+		return (-1);
+	}
+	return (nread);
 }
 
 /**
@@ -47,6 +55,11 @@ char **parse_command(char *line)
 		return (NULL);
 	}
 	token = strtok(line, delim);
+	if (token == NULL)
+	{
+		free(line_copy);
+		return (NULL);
+	}
 	for (i = 0; token != NULL; i++)
 	{
 		argv_cmd[i] = strdup(token);
