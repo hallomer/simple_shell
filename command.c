@@ -10,23 +10,9 @@
 */
 ssize_t read_command(char **line, size_t *n, FILE *input_stream)
 {
-	ssize_t nread;
-
 	if (isatty(fileno(input_stream)))
-	{
 		printf("(H) ");
-	}
-
-	nread = getline(line, n, input_stream);
-	if (nread == -1)
-	{
-		if (*line)
-		{
-			free(*line);
-			*line = NULL;
-		}
-	}
-	return (nread);
+	return (getline(line, n, input_stream));
 }
 
 /**
@@ -37,12 +23,12 @@ ssize_t read_command(char **line, size_t *n, FILE *input_stream)
 */
 char **parse_command(char *line)
 {
-	char *token, **argv_cmd, *line_copy = strdup(line);
+	char *token;
+	char **argv_cmd;
 	int num_tokens = 0, i, j;
 	const char *delim = " \t\r\n";
+	char *line_copy = strdup(line);
 
-	if (line_copy == NULL)
-		return (NULL);
 	token = strtok(line_copy, delim);
 	while (token != NULL)
 	{
@@ -66,7 +52,7 @@ char **parse_command(char *line)
 		argv_cmd[i] = strdup(token);
 		if (argv_cmd[i] == NULL)
 		{
-			for (j = 0; j < i; j++)
+			for (j = 0; j <= i; j++)
 				free(argv_cmd[j]);
 			free(argv_cmd);
 			free(line_copy);

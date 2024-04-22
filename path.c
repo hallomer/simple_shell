@@ -1,11 +1,10 @@
 #include "shell.h"
 
-
 /**
- * handle_empty_path - Helper fucntion
- * @cmd: command to handle
+ * handle_empty_path - Helper function
+ * @cmd: command to check
  *
- * Return: command path or NULL
+ * Return: command path if it or NULL
 */
 char *handle_empty_path(char *cmd)
 {
@@ -58,8 +57,6 @@ char *search_path(char *path, char *cmd)
 	return (NULL);
 }
 
-
-
 /**
  * get_path - Finds the full path of a command in the system's PATH
  * @cmd: command to find the full path for
@@ -72,7 +69,7 @@ char *get_path(char *cmd)
 	struct stat buffer;
 
 	path = getenv("PATH");
-	if (path == NULL || *path == '\0')
+	if (!path || *path == '\0')
 		return (handle_empty_path(cmd));
 
 	full_path = search_path(path, cmd);
