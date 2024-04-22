@@ -13,7 +13,7 @@ int execute_command(char **argv_cmd, char *prog_name, int argc)
 	char *command_path;
 	int status;
 
-	if (handle_exit(argv_cmd))
+	if (handle_builtins(argv_cmd))
 		return (0);
 
 	command_path = get_command_path(argv_cmd[0], prog_name, argc);
@@ -27,16 +27,21 @@ int execute_command(char **argv_cmd, char *prog_name, int argc)
 }
 
 /**
- * handle_exit - Handle the "exit" built-in command
+ * handle_builtins - Handle built-in commands
  * @argv_cmd: array containing the command and its arguments
  *
- * Return: 1 if the command is "exit", 0 otherwise
+ * Return: 1 if the command is a built-in, 0 otherwise
  */
-int handle_exit(char **argv_cmd)
+int handle_builtins(char **argv_cmd)
 {
 	if (strcmp(argv_cmd[0], "exit") == 0)
 	{
 		exit(0);
+	}
+	else if (strcmp(argv_cmd[0], "env") == 0)
+	{
+		print_environment();
+		return (1);
 	}
 	return (0);
 }
@@ -100,4 +105,20 @@ int fork_and_execute(char *command_path, char **argv_cmd, char *prog_name)
 	}
 
 	return (0);
+}
+
+/**
+ * print_environment - Print the current environment variables
+ *
+ * Return - nothing
+*/
+void print_environment(void)
+{
+	int i;
+
+	for (i = 0; environ[i] != NULL; i++)
+	{
+		write(STDOUT_FILENO, environ[i], strlen(environ[i]));
+		write(STDOUT_FILENO, "\n", 1);
+	}
 }
