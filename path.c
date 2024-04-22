@@ -72,7 +72,7 @@ char *get_path(char *cmd)
 	struct stat buffer;
 
 	path = getenv("PATH");
-	if (!path || *path == '\0')
+	if (path == NULL || *path == '\0')
 		return (handle_empty_path(cmd));
 
 	full_path = search_path(path, cmd);

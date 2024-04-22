@@ -45,10 +45,8 @@ int main(int argc, char **argv)
 	if (input_stream != stdin)
 		fclose(input_stream);
 
-	if (status == 127)
-		return (EXIT_FAILURE);
-	else
-		return (EXIT_SUCCESS);
+
+	return (status);
 }
 
 /**

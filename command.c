@@ -41,10 +41,9 @@ ssize_t read_command(char **line, size_t *n, FILE *input_stream)
 int execute_command(char **argv_cmd, char *prog_name, int argc)
 {
 	pid_t child_pid;
-	int status;
+	int status, return_status = 0;
 	char *command_path = argv_cmd[0];
 
-	(void)argc;
 	if (access(command_path, X_OK) == -1)
 	{
 		command_path = get_path(argv_cmd[0]);
@@ -68,7 +67,8 @@ int execute_command(char **argv_cmd, char *prog_name, int argc)
 		if (execve(command_path, argv_cmd, environ) == -1)
 		{
 			perror(prog_name);
-			exit(127);
+			return_status = (127);
+			exit(return_status);
 		}
 	}
 	else
@@ -79,7 +79,7 @@ int execute_command(char **argv_cmd, char *prog_name, int argc)
 		return (WEXITSTATUS(status));
 	}
 
-	return (0);
+	return (return_status);
 }
 
 
