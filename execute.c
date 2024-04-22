@@ -7,7 +7,7 @@
  * @argc: number of arguments passed to the program
  *
  * Return: 0 on success, 1 on failure
- */
+*/
 int execute_command(char **argv_cmd, char *prog_name, int argc)
 {
 	char *command_path;
@@ -31,7 +31,7 @@ int execute_command(char **argv_cmd, char *prog_name, int argc)
  * @argv_cmd: array containing the command and its arguments
  *
  * Return: 1 if the command is a built-in, 0 otherwise
- */
+*/
 int handle_builtins(char **argv_cmd)
 {
 	if (strcmp(argv_cmd[0], "exit") == 0)
@@ -53,7 +53,7 @@ int handle_builtins(char **argv_cmd)
  * @argc: number of arguments passed to the program
  *
  * Return: full path of the command, or NULL if not found
- */
+*/
 char *get_command_path(char *command, char *prog_name, int argc)
 {
 	char *command_path = command;
