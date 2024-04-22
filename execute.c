@@ -26,22 +26,34 @@ int execute_command(char **argv_cmd, char *prog_name, int argc)
 	return (status);
 }
 
+
 /**
  * handle_builtins - Handle built-in commands
  * @argv_cmd: array containing the command and its arguments
  *
- * Return: 1 if the command is a built-in, 0 otherwise
-*/
+ * Return: exit status, or 0 if command is not a built-in
+ */
 int handle_builtins(char **argv_cmd)
 {
+	int status = 0;
+
 	if (strcmp(argv_cmd[0], "exit") == 0)
 	{
-		exit(0);
+		if (argv_cmd[1])
+		{
+			status = atoi(argv_cmd[1]);
+			if (status == 0 && strcmp(argv_cmd[1], "0") != 0)
+			{
+				fprintf(stderr, "exit: %s: numeric argument required\n", argv_cmd[1]);
+				return (2);
+			}
+		}
+		exit(status);
 	}
 	else if (strcmp(argv_cmd[0], "env") == 0)
 	{
 		print_environment();
-		return (1);
+		return (0);
 	}
 	return (0);
 }
