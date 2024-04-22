@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 	char **argv_cmd = NULL;
 	char *prog_name = argv[0];
 	FILE *input_stream = stdin;
-	int status;
+	int status = 0, last_status = 0;
 
 	if (argc > 1)
 		input_stream = fopen(argv[1], "r");
@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 		if (argv_cmd == NULL)
 			continue;
 
-		status = execute_command(argv_cmd, prog_name, argc);
+		status = execute_command(argv_cmd, prog_name, argc, &last_status);
 		free_argv(argv_cmd);
 	}
 	if (line)
