@@ -65,20 +65,27 @@ char *search_path(char *path, char *cmd)
 */
 char *get_path(char *cmd)
 {
-	char *path, *full_path;
-	struct stat buffer;
+    char *path, *full_path, *cmd_copy;
+    struct stat buffer;
 
-	path = getenv("PATH");
-	if (!path || *path == '\0')
-		return (handle_empty_path(cmd));
+    path = getenv("PATH");
+    cmd_copy = strdup(cmd);
+    if (!path || *path == '\0')
+    {
+        full_path = handle_empty_path(cmd_copy);
+        free(cmd_copy);
+        if (full_path)
+            return (full_path);
+        return (NULL);
+    }
 
-	full_path = search_path(path, cmd);
-	if (full_path)
-		return (full_path);
+    full_path = search_path(path, cmd_copy);
+    free(cmd_copy);
+    if (full_path)
+        return (full_path);
 
-	if (stat(cmd, &buffer) == 0)
-		return (strdup(cmd));
+    if (stat(cmd, &buffer) == 0)
+        return (strdup(cmd));
 
-	free(full_path);
-	return (NULL);
+    return (NULL);
 }
